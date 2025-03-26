@@ -1,0 +1,85 @@
+services:
+  mongo-db:
+    image: mongo:7.0
+  nats-s:
+    image: nats
+  postgres-db:
+    image: postgres:16.2
+    environment:
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_USER: postgres
+  auth:
+    depends_on:
+      - mongo-db
+      - nats-s
+    build:
+      context: ./auth
+      dockerfile: dockerfile
+    image: auth-ms
+    volumes:
+      - ./auth/src:/usr/src/app/src
+    env_file: "./auth/.env"
+    environment:
+      - DATABASE_URL=mongodb://mongo-db:27017/usersms
+      - NATS_SERVER=nats://nats-s:4222
+    command: npm run start:dev
+  products:
+    depends_on:
+      - postgres-db
+      - nats-s
+    build:
+      context: ./productsms
+      dockerfile: dockerfile
+    image: products-ms
+    volumes:
+      - ./productsms/src:/usr/src/app/src
+    env_file:
+      - "./productsms/.env"
+    environment:
+      - DATABASE_URL=postgresql://postgres:123456@postgres-db:5432/productsmsdb?schema=public
+      - NATS_SERVER=nats://nats-s:4222
+    command: npm run start:docker
+  payments:
+    depends_on:
+      - nats-s
+    build:
+      context: ./paymentms
+      dockerfile: dockerfile
+    image: payment-ms
+    volumes:
+      - ./paymentms/src:/usr/src/app/src
+    env_file:
+      - "./paymentms/.env"
+    environment:
+      - NATS_SERVER=nats://nats-s:4222
+    command: npm run start:dev
+  orders:
+    depends_on:
+      - mongo-db
+      - nats-s
+    build:
+      context: ./ordersms
+      dockerfile: dockerfile
+    image: orders-ms
+    volumes:
+      - ./ordersms/src:/usr/src/app/src
+    env_file:
+      - "./ordersms/.env"
+    environment:
+      - DATABASE_URL=mongodb://mongo-db:27017/ordersms
+      - NATS_SERVER=nats://nats-s:4222
+    command: npm run start:dev
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: dockerfile
+    image: gateway
+    volumes:
+      - ./gateway/src:/usr/src/app/src
+    ports:
+      - 4000:4000
+    env_file:
+      - "./gateway/.env"
+    environment:
+      - NATS_SERVER=nats://nats-s:4222
+    command: npm run start:dev

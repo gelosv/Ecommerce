@@ -1,0 +1,43 @@
+services:
+  nats-prod:
+    image: nats
+  products:
+    build:
+      context: ./productsms
+      dockerfile: dockerfile.prod
+      args:
+        - DB=${DB_PRODUCTS}
+    image: products-ms-prod
+    environment:
+      - NATS_SERVER=nats://nats-prod:4222
+  orders:
+    build:
+      context: ./ordersms
+      dockerfile: dockerfile.prod
+      args:
+        - DATABASE_URL=${DB_MONGO}
+    image: orders-ms-prod
+    environment:
+      - NATS_SERVER=nats://nats-prod:4222
+  payments:
+    build:
+      context: ./paymentms
+      dockerfile: dockerfile.prod
+    image: payment-ms-prod
+    environment:
+      - NATS_SERVER=nats://nats-prod:4222
+      - STRIPE=${STRIPE}
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+      - SUCCESS_URL=${SUCCESS_URL}
+      - CANCEL_URL=${CANCEL_URL}
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: dockerfile.prod
+    image: gateway-prod
+    ports:
+      - 3000:3000
+    environment:
+      - NATS_SERVER=nats://nats-prod:4222
+      - JWT=${JWT}
+      - PORT=3000
