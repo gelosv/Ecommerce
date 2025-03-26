@@ -1,0 +1,15 @@
+[submodule "gateway"]
+	path = gateway
+	url = https://github.com/MicroservicioNest/gateway.git
+[submodule "auth"]
+	path = auth
+	url = https://github.com/MicroservicioNest/authms.git
+[submodule "paymentms"]
+	path = paymentms
+	url = https://github.com/MicroservicioNest/paymentsms.git
+[submodule "ordersms"]
+	path = ordersms
+	url = https://github.com/MicroservicioNest/ordersms.git
+[submodule "productsms"]
+	path = productsms
+	url = https://github.com/MicroservicioNest/products-ms.git
