@@ -43,3 +43,14 @@ E-commerce desarrollado utilizando la arquitectura de microservicios, conformado
 - Docker
 - Stripe
 - Prisma
+- AWS ECS
+
+## Ejecución proyecto
+
+1. Primero es necesario configurar las variables de entorno de los microservicios
+2. Ejecutar docker compose
+
+  docker compose up -f docker-compose.yml up
+
+El archivo docker compose tiene todas las configuraciones necesarias para que el proyecto funcione correctamente en localhost:4000
+
